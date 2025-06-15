@@ -13,6 +13,22 @@ def get_db():
         yield db
     finally:
         db.close()
+@router.get("/estadisticas")
+def estadisticas_usuarios(db: Session = Depends(SessionLocal)):
+    usuarios = db.query(Usuario).all()
+
+    total = len(usuarios)
+    roles = Counter([u.rol for u in usuarios if u.rol])
+    municipios = Counter([u.municipio for u in usuarios if u.municipio])
+    etapas = Counter([u.etapa for u in usuarios if u.etapa])
+
+    return {
+        "total_usuarios": total,
+        "productores": roles.get("productor", 0),
+        "consumidores": roles.get("consumidor", 0),
+        "municipios_comunes": municipios.most_common(3),
+        "etapas_comunes": etapas.most_common(3),
+    }
 
 @router.post("/register", response_model=UsuarioOut)
 def register_user(usuario: UsuarioCreate, db: Session = Depends(get_db)):
@@ -70,3 +86,4 @@ def eliminar_usuario(id: int, db: Session = Depends(get_db)):
     db.delete(usuario)
     db.commit()
     return {"mensaje": f"Usuario con ID {id} eliminado correctamente"}
+
