@@ -5,6 +5,7 @@ from app.models.usuario import Usuario
 from app.schemas.usuario import UsuarioLogin
 from app.schemas.usuario import UsuarioCreate, UsuarioOut
 
+
 router = APIRouter(prefix="/api/usuarios", tags=["Usuarios"])
 
 def get_db():
@@ -13,6 +14,7 @@ def get_db():
         yield db
     finally:
         db.close()
+
 @router.get("/estadisticas")
 def estadisticas_usuarios(db: Session = Depends(SessionLocal)):
     usuarios = db.query(Usuario).all()
